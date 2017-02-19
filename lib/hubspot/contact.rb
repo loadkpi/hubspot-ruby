@@ -17,7 +17,7 @@ module Hubspot
     UPDATE_CONTACT_PATH          = '/contacts/v1/contact/vid/:contact_id/profile'
     DESTROY_CONTACT_PATH         = '/contacts/v1/contact/vid/:contact_id'
     CONTACTS_PATH                = '/contacts/v1/lists/all/contacts/all'
-    RECENTLY_UPDATED_PATH        = '/contacts/v1/lists/recently_updated/contacts/recent'
+    RECENT_CONTACTS_PATH         = '/contacts/v1/lists/recently_updated/contacts/recent'
     CREATE_OR_UPDATE_PATH        = '/contacts/v1/contact/createOrUpdate/email/:contact_email'
     QUERY_PATH                   = '/contacts/v1/search/query'
 
@@ -34,16 +34,15 @@ module Hubspot
       # {https://developers.hubspot.com/docs/methods/contacts/get_recently_updated_contacts}
       def all(opts={})
         recent = opts.delete(:recent) { false }
-        paged = opts.delete(:paged) { false }
         path, opts =
         if recent
-          [RECENTLY_UPDATED_PATH, Hubspot::ContactProperties.add_default_parameters(opts)]
+          [RECENT_CONTACTS_PATH, Hubspot::ContactProperties.add_default_parameters(opts)]
         else
           [CONTACTS_PATH, opts]
         end
 
         response = Hubspot::Connection.get_json(path, opts)
-        paged ? response : response['contacts'].map { |c| new(c) }
+        response['contacts'].map { |c| new(c) }
       end
 
       # TODO: create or update a contact
